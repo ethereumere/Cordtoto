@@ -1,0 +1,722 @@
+f<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LASPLEEN CORD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #c42c2c;
+            --background: transparent;
+            --surface: rgba(0, 0, 0, 0.3);
+            --text-primary: #c42c2c;
+            --text-secondary: #a0a0a0;
+            --accent: rgba(0, 0, 0, 0.2);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success: #c42c2c;
+            --danger: #c42c2c;
+            --border-radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            min-height: 100%;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            background-image: url('https://media.discordapp.net/attachments/1490301183032692849/1490773031209926698/image.png?ex=69d54613&is=69d3f493&hm=89f5aed52b5f4374549e114f0f48499d0b80ccebb808999c365465ce4ce7f525&=&format=webp&quality=lossless');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); pointer-events: none; z-index: -1; }
+
+        .container { display: flex; flex-direction: column; height: 100vh; }
+        .header { background: rgba(0, 0, 0, 0.4); padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 700; color: var(--primary-color); text-shadow: 0 0 10px rgba(114,137,218,0.5); }
+        .version { color: var(--text-secondary); font-size: 14px; }
+
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 220px; background: rgba(0, 0, 0, 0.4); padding: 20px 0; overflow-y: auto; border-right: 1px solid var(--border-color); }
+        .sidebar-section { margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; padding: 0 10px; }
+        .sidebar-item { padding: 11px 15px; margin: 3px 10px; border-radius: var(--border-radius); cursor: pointer; display: flex; align-items: center; color: var(--text-secondary); }
+        .sidebar-item:hover { background: var(--accent); color: var(--text-primary); }
+        .sidebar-item.active { background: var(--primary-color); color: #fff; font-weight: 700; }
+
+        .tab-content { flex: 1; padding: 20px; overflow-y: auto; display: none; }
+        .tab-content.active { display: block; }
+
+        .card { background: rgba(0, 0, 0, 0.3); border-radius: var(--border-radius); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: var(--text-primary); display: flex; align-items: center; }
+        .card-title i { margin-right: 10px; color: var(--primary-color); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 6px; font-size: 14px; color: var(--text-secondary); }
+        .form-control { width: 100%; padding: 10px; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-color); border-radius: var(--border-radius); color: var(--text-primary); }
+        textarea.form-control { min-height: 130px; resize: vertical; }
+
+        .btn { padding: 10px 16px; border: none; border-radius: var(--border-radius); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        .btn i { margin-right: 8px; }
+        .btn-primary { background: var(--primary-color); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-block { width: 100%; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn-group .btn { flex: 1; }
+
+        .checkbox { display: flex; align-items: center; cursor: pointer; }
+        .file-label { display: block; padding: 12px; background: rgba(0, 0, 0, 0.4); border: 2px dashed var(--primary-color); border-radius: var(--border-radius); text-align: center; cursor: pointer; color: var(--text-secondary); }
+        .file-input { display: none; }
+        .file-info { padding: 10px 12px; margin-top: 10px; background: rgba(0, 0, 0, 0.4); border-radius: var(--border-radius); border-left: 4px solid var(--success); font-size: 13px; color: var(--text-secondary); }
+
+        .btn-outline { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+
+        #notification-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .notification { background: rgba(0, 0, 0, 0.8); padding: 15px 20px; border-radius: var(--border-radius); border-left: 5px solid var(--primary-color); box-shadow: 0 4px 15px rgba(0,0,0,0.6); display: flex; align-items: center; min-width: 280px; }
+
+        @media (max-width: 900px) {
+            body {
+                overflow: auto;
+                background-attachment: scroll;
+                background-size: cover;
+                background-position: center center;
+            }
+            .container {
+                height: auto;
+            }
+            .main-content {
+                flex-direction: column;
+                overflow: visible;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .sidebar-item {
+                margin: 6px 10px;
+                padding: 14px 15px;
+                font-size: 15px;
+            }
+            .tab-content {
+                padding: 15px;
+                min-height: auto;
+            }
+            .card {
+                margin-bottom: 15px;
+                padding: 16px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn {
+                width: 100%;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .logo { font-size: 22px; }
+            .version { font-size: 13px; }
+            .form-control, .file-label {
+                font-size: 15px;
+            }
+            #notification-container {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                right: auto;
+            }
+            .notification { min-width: auto; width: calc(100vw - 30px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow"></div>
+    <div id="notification-container"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">LASPLEEN CORD</div>
+            <div class="version">v2.3 - Full</div>
+        </div>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">compte & id</div>
+                    <div class="sidebar-item active" data-tab="accounts"> tes comptes sale chienne</div>
+                    <div class="sidebar-item" data-tab="channel"> id du salon</div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-title">mec du chat</div>
+                    <div class="sidebar-item" data-tab="normal"> message</div>
+                    <div class="sidebar-item" data-tab="autoping"> auto Ping</div>
+                    <div class="sidebar-item" data-tab="tiny"> tiny</div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-title">paramÃ¨tres</div>
+                    <div class="sidebar-item" data-tab="options"> en +</div>
+                    <div class="sidebar-item" data-tab="dashboard"> tes actions</div>
+                </div>
+            </div>
+
+            <!-- ACCOUNTS -->
+            <div class="tab-content active" id="accounts-tab">
+                <div class="card">
+                    <div class="card-title"> compte</div>
+                    <div class="form-group"><label class="form-label">tes comptes</label><select id="accountSelector" class="form-control"></select></div>
+                    <div class="btn-group">
+                        <button id="viewToken" class="btn btn-outline"><i class="fas fa-eye"></i> voir le token</button>
+                        <button id="removeAccount" class="btn btn-danger"><i class="fas fa-user-minus"></i> supprimer le token</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title"> ajoute ton compte</div>
+                    <div class="form-group"><label class="form-label">alias</label><input type="text" id="accountAlias" class="form-control" placeholder="nom du compte"></div>
+                    <div class="form-group"><label class="form-label">discord token</label><input type="password" id="newAccountToken" class="form-control" placeholder="colle ton token"></div>
+                    <button id="addAccount" class="btn btn-primary btn-block"><i class="fas fa-plus"></i>ajouter</button>
+                </div>
+            </div>
+
+            <!-- CHANNEL -->
+            <div class="tab-content" id="channel-tab">
+                <div class="card">
+                    <div class="card-title"> chat </div>
+                    <div class="form-group"><label class="form-label">chat id</label><input type="text" id="globalChannelId" class="form-control" placeholder="ID du salon"></div>
+                </div>
+            </div>
+
+            <!-- NORMAL - EntrÃ©e = 1 token avec alternance -->
+            <div class="tab-content" id="normal-tab">
+                <div class="card">
+                    <div class="card-title"> Message Normal</div>
+                    <div class="form-group">
+                        <label class="form-label"></label>
+                        <textarea id="message" class="form-control" placeholder="ecris ici"></textarea>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">le nombre de message par token puis switch (si ta le switch mode) (8-12)</label>
+                        <input type="number" id="msgPerToken" class="form-control" value="10" min="8" max="12">
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="btn-group">
+                        <button id="tokenSwitchMode" class="btn btn-success"><i class="fas fa-exchange-alt"></i> Token Switch</button>
+                        <button id="singleTokenMode" class="btn btn-primary"><i class="fas fa-lock"></i> 1 Token Mode</button>
+                    </div>
+                    <button id="sendMessageATATS" class="btn btn-danger btn-block" style="margin-top:10px;"><i class="fas fa-rocket"></i> envoyez avec tous les tokens</button>
+                </div>
+            </div>
+
+            <!-- AUTO PING -->
+            <div class="tab-content" id="autoping-tab">
+                <div class="card">
+                    <div class="card-title"> Auto Ping</div>
+                    <div class="form-group">
+                        <label class="checkbox"><input type="checkbox" id="autoPingEnabled" checked><span class="checkbox-label">auto ping</span></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">user ID(s)</label>
+                        <input type="text" id="autoPingUsers" class="form-control" placeholder="123456789012345678, 987654321098765432">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position</label>
+                        <select id="pingPosition" class="form-control">
+                            <option value="end">Ã€ la fin</option>
+                            <option value="start">Au dÃ©but</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TINY -->
+            <div class="tab-content" id="tiny-tab">
+                <div class="card">
+                    <div class="card-title"> Tiny - 10 Messages par Token</div>
+                    <label class="form-label">Messages Ã  envoyer (un par ligne)</label>
+                    <textarea id="tinyMessages" class="form-control" style="min-height:200px;">tiny
+tiny spam
+test
+hey
+ok
+yo
+x
+y
+z
+lol</textarea>
+                </div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">DÃ©lai entre messages (ms)</label>
+                        <input type="number" id="tinyDelay" class="form-control" value="0" min="0">
+                    </div>
+                </div>
+                <div class="card">
+                    <button id="startTiny" class="btn btn-success btn-block" style="font-size:16px; padding:15px;"><i class="fas fa-rocket"></i> Lancer Tiny</button>
+                    <button id="stopTiny" class="btn btn-danger btn-block" style="margin-top:8px;">ArrÃªter</button>
+                </div>
+            </div>
+
+            <!-- OPTIONS -->
+            <div class="tab-content" id="options-tab">
+                <div class="card">
+                    <div class="card-title"> image de fond</div>
+                    <div class="form-group">
+                        <label class="form-label">URL de l'image</label>
+                        <input type="text" id="backgroundImageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">OpacitÃ© de l'image(0-100%)</label>
+                        <input type="range" id="overlayOpacity" class="form-control" min="0" max="100" value="70" style="cursor: pointer;">
+                        <small style="color: var(--text-secondary);">opacitÃ© actuelle: <span id="opacityValue">70</span>%</small>
+                    </div>
+                    <button id="applyBackground" class="btn btn-primary btn-block">Appliquer l'image</button>
+                </div>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="tab-content" id="dashboard-tab">
+                <div class="card">
+                    <div class="card-title"> log</div>
+                    <div id="live-log-container" style="height: 520px; background:rgba(0, 0, 0, 0.6); padding:12px; overflow-y:auto; font-family:monospace; font-size:13px;"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Discord Logo -->
+    <div id="discord-logo" style="position: fixed; bottom: 10px; left: 10px; cursor: pointer; z-index: 1000; font-size: 24px; color: #5865f2;">
+        <i class="fab fa-discord"></i>
+    </div>
+
+    <script>
+        const APP = {
+            API_BASE: 'https://discord.com/api/v9',
+            accounts: [],
+            currentTokenIndex: 0,
+            tinyRunning: false,
+            tinyTokenIndex: 0,
+            tinyMessages: [],
+            tinyDelay: 0,
+            msSpeedFactor: 0.02,
+            autoPingEnabled: true,
+            autoPingUsers: [],
+            pingPosition: 'end',
+            tokenSwitchActive: false,
+            singleTokenActive: false,
+            messagesWithCurrentToken: 0,
+            msgPerTokenLimit: 10,
+            init() {
+                this.loadData();
+                this.attachEventListeners();
+                this.loadBackgroundImage();
+                this.fetchUsernames();
+                this.showNotification('Laspleen Cord v2.3 - Tous les onglets remplis', 'success');
+            },
+
+            loadData() {
+                const saved = localStorage.getItem('xancord_accounts');
+                this.accounts = saved ? JSON.parse(saved) : [];
+            },
+
+            saveData() { localStorage.setItem('xancord_accounts', JSON.stringify(this.accounts)); },
+
+            async fetchUsernames() {
+                for (let acc of this.accounts) {
+                    if (!acc.username) {
+                        const data = await this.makeRequest('/users/@me', acc.token);
+                        acc.username = data ? `${data.username}#${data.discriminator||'0000'}` : 'Invalid Token';
+                    }
+                }
+                this.saveData();
+                this.initializeAccountSelector();
+            },
+
+            showNotification(msg, type = 'success') {
+                const cont = document.getElementById('notification-container');
+                const n = document.createElement('div');
+                n.className = `notification ${type}`;
+                n.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i><div>${msg}</div>`;
+                cont.appendChild(n);
+                const duration = Math.max(300, Math.floor(3000 * this.msSpeedFactor));
+                setTimeout(() => n.remove(), duration);
+            },
+
+            log(msg) {
+                const el = document.getElementById('live-log-container');
+                if (el) {
+                    const line = document.createElement('div');
+                    line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                    el.appendChild(line);
+                    el.scrollTop = el.scrollHeight;
+                }
+            },
+
+            async makeRequest(endpoint, token, options = {}) {
+                try {
+                    const res = await fetch(this.API_BASE + endpoint, {
+                        method: options.method || 'GET',
+                        headers: { 'Authorization': token, 'Content-Type': 'application/json' },
+                        body: options.body || null
+                    });
+                    return res.ok ? await res.json() : null;
+                } catch { return null; }
+            },
+
+            switchTab(tab) {
+                document.querySelectorAll('.sidebar-item, .tab-content').forEach(e => e.classList.remove('active'));
+                document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+                document.getElementById(tab + '-tab')?.classList.add('active');
+            },
+
+            initializeAccountSelector() {
+                const sel = document.getElementById('accountSelector');
+                sel.innerHTML = '<option value="">-- choisis ton compte --</option>';
+                this.accounts.forEach(acc => {
+                    const o = document.createElement('option');
+                    o.value = acc.token;
+                    o.textContent = `${acc.alias} (${acc.username})`;
+                    sel.appendChild(o);
+                });
+            },
+
+            getChannelId() {
+                return document.getElementById('globalChannelId').value.trim();
+            },
+
+            getSelectedAccount() {
+                const sel = document.getElementById('accountSelector');
+                if (!sel) return null;
+                const token = sel.value;
+                return this.accounts.find(a => a.token === token) || null;
+            },
+
+            applyAutoPing(text) {
+                if (!this.autoPingEnabled || this.autoPingUsers.length === 0) return text;
+                const pings = this.autoPingUsers.map(id => `<@${id}>`).join(' ');
+                return this.pingPosition === 'start' ? pings + ' ' + text : text + ' ' + pings;
+            },
+
+            async sendWithSingleToken(content) {
+                const channelId = this.getChannelId();
+                if (!channelId) return this.showNotification('Channel ID manquant !', 'danger');
+                if (this.accounts.length === 0) return this.showNotification('Aucun token ajoutÃ©', 'danger');
+
+                const selectedAccount = this.getSelectedAccount();
+                if (!selectedAccount) return this.showNotification('SÃ©lectionne un compte pour le mode 1 token', 'danger');
+
+                content = this.applyAutoPing(content);
+
+                await this.makeRequest(`/channels/${channelId}/messages`, selectedAccount.token, {
+                    method: 'POST',
+                    body: JSON.stringify({ content })
+                });
+
+                this.log(`Message envoyÃ© avec le token sÃ©lectionnÃ© (${selectedAccount.alias})`);
+            },
+
+            async sendWithAllTokens(content) {
+                const channelId = this.getChannelId();
+                if (!channelId) return this.showNotification('Channel ID manquant !', 'danger');
+                if (this.accounts.length === 0) return this.showNotification('Aucun token ajoutÃ©', 'danger');
+
+                content = this.applyAutoPing(content);
+
+                const requests = this.accounts.map(acc => this.makeRequest(`/channels/${channelId}/messages`, acc.token, {
+                    method: 'POST',
+                    body: JSON.stringify({ content })
+                }));
+
+                await Promise.allSettled(requests);
+                this.showNotification(`EnvoyÃ© avec ${this.accounts.length} tokens`, 'success');
+            },
+
+            async sendWithTokenSwitch(content) {
+                const channelId = this.getChannelId();
+                if (!channelId) return this.showNotification('Channel ID manquant !', 'danger');
+                if (this.accounts.length === 0) return this.showNotification('Aucun token ajoutÃ©', 'danger');
+
+                content = this.applyAutoPing(content);
+
+                if (this.messagesWithCurrentToken >= this.msgPerTokenLimit) {
+                    this.currentTokenIndex++;
+                    this.messagesWithCurrentToken = 0;
+                }
+
+                const token = this.accounts[this.currentTokenIndex % this.accounts.length].token;
+                this.messagesWithCurrentToken++;
+
+                await this.makeRequest(`/channels/${channelId}/messages`, token, {
+                    method: 'POST',
+                    body: JSON.stringify({ content })
+                });
+
+                this.log(`[TokenSwitch] Msg ${this.messagesWithCurrentToken}/${this.msgPerTokenLimit} (token ${(this.currentTokenIndex % this.accounts.length) + 1})`);
+            },
+
+            attachEventListeners() {
+                document.querySelectorAll('.sidebar-item[data-tab]').forEach(item => {
+                    item.addEventListener('click', () => this.switchTab(item.dataset.tab));
+                });
+
+                const msgArea = document.getElementById('message');
+
+                // EntrÃ©e = Envoi selon le mode actif
+                msgArea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const text = msgArea.value.trim();
+                        if (text) {
+                            if (this.singleTokenActive) {
+                                this.sendWithSingleToken(text);
+                            } else if (this.tokenSwitchActive) {
+                                this.sendWithTokenSwitch(text);
+                            } else {
+                                this.sendWithAllTokens(text);
+                            }
+                            msgArea.value = '';
+                        }
+                    }
+                });
+
+                // Token Switch Mode
+                document.getElementById('tokenSwitchMode').addEventListener('click', () => {
+                    this.msgPerTokenLimit = parseInt(document.getElementById('msgPerToken').value) || 10;
+                    this.singleTokenActive = false;
+                    this.tokenSwitchActive = true;
+                    this.messagesWithCurrentToken = 0;
+                    document.getElementById('tokenSwitchMode').style.opacity = '1';
+                    document.getElementById('singleTokenMode').style.opacity = '0.5';
+                    this.showNotification('Mode Token Switch activÃ©', 'success');
+                    this.log('Mode Token Switch activÃ©');
+                });
+
+                // Single Token Mode
+                document.getElementById('singleTokenMode').addEventListener('click', () => {
+                    this.singleTokenActive = true;
+                    this.tokenSwitchActive = false;
+                    document.getElementById('singleTokenMode').style.opacity = '1';
+                    document.getElementById('tokenSwitchMode').style.opacity = '0.5';
+                    this.showNotification('Mode 1 Token activÃ©', 'success');
+                    this.log('Mode 1 Token activÃ©');
+                });
+
+                document.getElementById('sendMessageATATS').addEventListener('click', () => {
+                    const text = msgArea.value.trim();
+                    if (text) this.sendWithAllTokens(text);
+                });
+
+                // Auto Ping
+                document.getElementById('autoPingEnabled').addEventListener('change', e => this.autoPingEnabled = e.target.checked);
+                document.getElementById('autoPingUsers').addEventListener('input', e => {
+                    this.autoPingUsers = e.target.value.split(',').map(x => x.trim()).filter(Boolean);
+                });
+                document.getElementById('pingPosition').addEventListener('change', e => this.pingPosition = e.target.value);
+
+                // Accounts
+                document.getElementById('addAccount').addEventListener('click', () => this.addAccount());
+                document.getElementById('removeAccount').addEventListener('click', () => this.removeAccount());
+                document.getElementById('viewToken').addEventListener('click', () => this.viewToken());
+
+                // Update msgPerToken when input changes
+                document.getElementById('msgPerToken').addEventListener('change', (e) => {
+                    this.msgPerTokenLimit = parseInt(e.target.value) || 10;
+                });
+
+                // Tiny
+                document.getElementById('tinyMessages').addEventListener('input', (e) => {
+                    this.tinyMessages = e.target.value.split('\n').filter(line => line.trim());
+                });
+                document.getElementById('tinyDelay').addEventListener('change', (e) => {
+                    const value = parseInt(e.target.value);
+                    this.tinyDelay = Number.isNaN(value) ? 0 : Math.max(0, value);
+                });
+                document.getElementById('startTiny').addEventListener('click', () => this.startTiny());
+                document.getElementById('stopTiny').addEventListener('click', () => this.stopTiny());
+
+                // Initialize tiny messages on load
+                const tinyTextarea = document.getElementById('tinyMessages');
+                if (tinyTextarea) {
+                    this.tinyMessages = tinyTextarea.value.split('\n').filter(line => line.trim());
+                }
+
+                // Background Image
+                document.getElementById('overlayOpacity').addEventListener('input', (e) => {
+                    document.getElementById('opacityValue').textContent = e.target.value;
+                    const opacity = e.target.value / 100;
+                    document.querySelector('.glow').style.background = `rgba(0, 0, 0, ${opacity})`;
+                });
+
+                document.getElementById('applyBackground').addEventListener('click', () => this.applyBackground());
+
+                // Discord logo click
+                document.getElementById('discord-logo').addEventListener('click', () => this.copyDiscordLink());
+
+                this.log('Tous les onglets sont maintenant remplis et fonctionnels');
+            },
+
+            addAccount() {
+                const alias = document.getElementById('accountAlias').value.trim();
+                const token = document.getElementById('newAccountToken').value.trim();
+                if (!alias || !token) return this.showNotification('Remplis tous les champs', 'danger');
+                this.accounts.push({ alias, token });
+                this.saveData();
+                this.fetchUsernames();
+                this.showNotification('Compte ajoutÃ©', 'success');
+            },
+
+            removeAccount() {
+                const token = document.getElementById('accountSelector').value;
+                if (!token) return;
+                this.accounts = this.accounts.filter(a => a.token !== token);
+                this.saveData();
+                this.initializeAccountSelector();
+                this.showNotification('Compte supprimÃ©', 'success');
+            },
+
+            viewToken() {
+                const token = document.getElementById('accountSelector').value;
+                if (token) {
+                    navigator.clipboard.writeText(token);
+                    this.showNotification('Token copiÃ©', 'success');
+                }
+            },
+
+            async startTiny() {
+                if (this.tinyMessages.length === 0) {
+                    return this.showNotification('Ajoute des messages Ã  envoyer !', 'danger');
+                }
+                if (this.accounts.length === 0) {
+                    return this.showNotification('Aucun token ajoutÃ©', 'danger');
+                }
+
+                const channelId = this.getChannelId();
+                if (!channelId) return this.showNotification('Channel ID manquant !', 'danger');
+
+                this.tinyRunning = true;
+                this.tinyTokenIndex = 0;
+                this.showNotification('Tiny lancÃ© ! Envoi en cours...', 'success');
+                this.log(`âš¡ Tiny dÃ©marrÃ© - ${this.tinyMessages.length} messages par token, dÃ©lai ${this.tinyDelay}ms`);
+
+                while (this.tinyRunning) {
+                    const token = this.accounts[this.tinyTokenIndex % this.accounts.length].token;
+                    const tokenNum = (this.tinyTokenIndex % this.accounts.length) + 1;
+
+                    const requests = this.tinyMessages.map((msg) =>
+                        this.makeRequest(`/channels/${channelId}/messages`, token, {
+                            method: 'POST',
+                            body: JSON.stringify({ content: msg })
+                        })
+                    );
+
+                    const results = await Promise.allSettled(requests);
+                    results.forEach((result, i) => {
+                        if (result.status === 'fulfilled') {
+                            this.log(`âœ‰ï¸ [Token ${tokenNum}] Message ${i + 1}/${this.tinyMessages.length} envoyÃ©`);
+                        } else {
+                            this.log(`âš ï¸ [Token ${tokenNum}] Message ${i + 1}/${this.tinyMessages.length} Ã©chouÃ©`);
+                        }
+                    });
+
+                    if (!this.tinyRunning) break;
+
+                    if (this.tinyDelay > 0) {
+                        const delay = Math.max(0, this.tinyDelay);
+                        if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+
+                    this.tinyTokenIndex++;
+                    this.log(`ðŸ”„ Passage au token suivant (${(this.tinyTokenIndex % this.accounts.length) + 1})`);
+                }
+
+                if (!this.tinyRunning) {
+                    this.showNotification('Tiny arrÃªtÃ©', 'danger');
+                    this.log('âŒ Tiny arrÃªtÃ©');
+                }
+            },
+
+            stopTiny() {
+                this.tinyRunning = false;
+            },
+
+            applyBackground() {
+                const url = document.getElementById('backgroundImageUrl').value.trim();
+                const opacity = document.getElementById('overlayOpacity').value / 100;
+                
+                if (!url) {
+                    return this.showNotification('Entre une URL valide !', 'danger');
+                }
+
+                document.body.style.backgroundImage = `url('${url}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundAttachment = window.innerWidth <= 900 ? 'scroll' : 'fixed';
+                document.body.style.backgroundColor = 'transparent';
+                document.querySelector('.glow').style.background = `rgba(0, 0, 0, ${opacity})`;
+                
+                this.showNotification('Image de fond appliquÃ©e !', 'success');
+                this.log('âœ… Image de fond appliquÃ©e');
+                
+                // Sauvegarder l'URL et l'opacitÃ©
+                localStorage.setItem('background_image_url', url);
+                localStorage.setItem('background_opacity', opacity);
+            },
+
+            loadBackgroundImage() {
+                const savedUrl = localStorage.getItem('background_image_url');
+                const savedOpacity = localStorage.getItem('background_opacity') || 0.7;
+                
+                if (savedUrl) {
+                    document.getElementById('backgroundImageUrl').value = savedUrl;
+                    document.body.style.backgroundImage = `url('${savedUrl}')`;
+                    document.body.style.backgroundSize = 'cover';
+                    document.body.style.backgroundPosition = 'center';
+                    document.body.style.backgroundRepeat = 'no-repeat';
+                    document.body.style.backgroundAttachment = window.innerWidth <= 900 ? 'scroll' : 'fixed';
+                    document.body.style.backgroundColor = 'transparent';
+                }
+                
+                // Appliquer l'opacitÃ© sauvegardÃ©e
+                const opacityPercent = Math.round(savedOpacity * 100);
+                document.getElementById('overlayOpacity').value = opacityPercent;
+                document.getElementById('opacityValue').textContent = opacityPercent;
+                document.querySelector('.glow').style.background = `rgba(0, 0, 0, ${savedOpacity})`;
+            },
+
+            copyDiscordLink() {
+                const link = 'https://discord.gg/BJdjDnRm5P';
+                navigator.clipboard.writeText(link).then(() => {
+                    this.showNotification('Lien Discord copiÃ© !', 'success');
+                }).catch(err => {
+                    console.error('Erreur lors de la copie:', err);
+                    this.showNotification('Erreur lors de la copie du lien', 'danger');
+                });
+            }
+
+        };
+
+        document.addEventListener('DOMContentLoaded', () => APP.init());
+    </script>
+</body>
+</html>
